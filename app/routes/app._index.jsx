@@ -7,7 +7,10 @@ import {
   getHost,
 } from "../init_Shopify_App/getSessionToken";
 import { json } from "@remix-run/node";
-import { Page } from "@shopify/polaris";
+import { Page, Grid } from "@shopify/polaris";
+import MainHeader from "../components/main_page/entrancePageHeader";
+import GridCell from "../components/main_page/displayGrid";
+import BodyMain from "../components/main_page/bodyMain";
 
 export const loader = async ({ request }) => {
   console.log("----------Server Side loaded------");
@@ -25,8 +28,7 @@ export default function Index() {
     const fetchSession = async () => {
       try {
         const app = InitShopifyApp(fetcher.host, fetcher.apiKey);
-        const sessionToken = await getSession(app); 
-        // console.log(sessionToken);
+        const sessionToken = await getSession(app);
 
         const response = await fetch("http://localhost:8080/getShopInfo", {
           method: "GET",
@@ -48,7 +50,14 @@ export default function Index() {
 
   return (
     <Page>
-      <h1>HELLO WORLD</h1>
+      <MainHeader />
+      <Grid>
+        <GridCell title={"Review requests sent"} number={0} percent={0} />
+        <GridCell title={"Reviews over time"} number={0} percent={0} />
+        <GridCell title={"Revenue generated"} number={0} percent={0} />
+        <GridCell title={"Average rating"} number={0} percent={0} />
+      </Grid>
+      <BodyMain tranPercent={10} authPercent={90} />
     </Page>
   );
 }
