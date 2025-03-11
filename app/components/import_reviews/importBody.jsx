@@ -3,7 +3,7 @@ import { Box, IndexTable, Card, Text, Button } from "@shopify/polaris";
 import TableHeader from "./tableHeader";
 import ImportButton from "./importButton";
 
-export default function ImportBody({ data }) {
+export default function ImportBody({ data, host }) {
   const [productInfo, setProductInfo] = useState([]);
   const [headerData, setHeaderData] = useState({
     products: 0,
@@ -97,7 +97,7 @@ export default function ImportBody({ data }) {
           <IndexTable.Cell>
             <ImportButton
               id={dt.id}
-              // url={`/app/importReview/${dt.id}`}
+              host={host}
             />
           </IndexTable.Cell>
         </IndexTable.Row>

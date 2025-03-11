@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "72da450e4e3eead6f7b5d1e266d6d7c7"
-application_url = "https://firefox-seen-foundation-filme.trycloudflare.com"
+application_url = "https://shopping-frederick-barnes-mechanical.trycloudflare.com"
 embedded = true
 name = "remix-frontend-review-app"
 handle = "remix-frontend-review-app"
@@ -28,9 +28,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://firefox-seen-foundation-filme.trycloudflare.com/auth/callback",
-  "https://firefox-seen-foundation-filme.trycloudflare.com/auth/shopify/callback",
-  "https://firefox-seen-foundation-filme.trycloudflare.com/api/auth/callback"
+  "https://shopping-frederick-barnes-mechanical.trycloudflare.com/auth/callback",
+  "https://shopping-frederick-barnes-mechanical.trycloudflare.com/auth/shopify/callback",
+  "https://shopping-frederick-barnes-mechanical.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]

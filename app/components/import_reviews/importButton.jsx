@@ -1,22 +1,7 @@
-import { useLoaderData } from "@remix-run/react";
+import { Link } from "@remix-run/react";
 import { Box, Button } from "@shopify/polaris";
-import { getHost } from "../../init_Shopify_App/getSessionToken";
 
-export const loader = async ({ request }) => {
-  const host = getHost(request);
-
-  return { host };
-};
-
-export default function ImportButton({ id, url }) {
-  const { host } = useLoaderData();
-
-  const handleNavigate = () => {
-    console.log(id, host);
-
-    open(`/app/importReview/${id}?host=${host}`, "_self");
-  };
-
+export default function ImportButton({ id }) {
   return (
     <Box
       style={{
@@ -25,9 +10,20 @@ export default function ImportButton({ id, url }) {
       }}
       id={id}
     >
-      <Button onClick={handleNavigate} url={url}>
-        Import Reviews
-      </Button>
+      <Link>
+        <Button
+          onClick={() => {
+            // console.log("Clicked", id);
+            // open(
+            //   `shopify://admin/apps/remix-frontend-review-app/app/importReview/${id}`,
+            //   "_self",
+            // );
+            open(`/app/importReview/${id}`, "_self");
+          }}
+        >
+          Import Reviews
+        </Button>
+      </Link>
     </Box>
   );
 }

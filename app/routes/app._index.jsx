@@ -1,43 +1,36 @@
 import { useEffect, useState } from "react";
-
-import { useLoaderData } from "@remix-run/react";
-import {
-  getSession,
-  InitShopifyApp,
-  getHost,
-} from "../init_Shopify_App/getSessionToken";
-import { json } from "@remix-run/node";
 import { Page, Grid } from "@shopify/polaris";
+import { useAppBridge } from "@shopify/app-bridge-react";
+import { authenticate } from "../shopify.server";
 import MainHeader from "../components/main_page/entrancePageHeader";
 import GridCell from "../components/main_page/displayGrid";
 import BodyMain from "../components/main_page/bodyMain";
 
 export const loader = async ({ request }) => {
-  console.log("----------Server Side loaded------");
-  const host = getHost(request);
-  const apiKey = process.env.SHOPIFY_API_KEY;
-
-  return json({ host, apiKey });
+  console.log("----------Home page------");
+  const session = await authenticate.admin(request);
+  if (!session) {
+    throw new Response("Unauthorized", { status: 401 });
+  }
+  return null;
 };
 
 export default function Index() {
-  const fetcher = useLoaderData();
+  const shopify = useAppBridge();
   const [products, setProducts] = useState(null);
 
   useEffect(() => {
     const fetchSession = async () => {
-      try {
-        const app = InitShopifyApp(fetcher.host, fetcher.apiKey);
-        const sessionToken = await getSession(app);
-
+      try {  
+        const accessToken = await shopify.idToken();
         const response = await fetch("http://localhost:8080/getShopInfo", {
           method: "GET",
           headers: {
-            authorization: `Bearer ${sessionToken}`,
-          },
+            authorization: `Bearer ${accessToken}`,
+          },    
         });
         const products = await response.json();
-        console.log(products);
+        // console.log(products);
         setProducts(products);
         return products;
       } catch (error) {
@@ -46,7 +39,7 @@ export default function Index() {
     };
 
     fetchSession();
-  }, [fetcher]);
+  }, []);
 
   return (
     <Page>

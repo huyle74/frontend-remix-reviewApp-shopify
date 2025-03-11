@@ -1,4 +1,7 @@
 import "@shopify/shopify-app-remix/adapters/node";
+import "@shopify/shopify-api/adapters/node";
+import "@shopify/shopify-api/adapters/cf-worker";
+
 import {
   ApiVersion,
   AppDistribution,

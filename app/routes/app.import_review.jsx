@@ -1,42 +1,28 @@
 import { useState, useEffect } from "react";
-import { useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/node";
-import {
-  Box,
-  Card,
-  Layout,
-  Link,
-  List,
-  Page,
-  Text,
-  BlockStack,
-} from "@shopify/polaris";
-import {
-  InitShopifyApp,
-  getHost,
-  getSession,
-} from "../init_Shopify_App/getSessionToken";
+import { Page } from "@shopify/polaris";
+import { useAppBridge } from "@shopify/app-bridge-react";
+import { authenticate } from "../shopify.server";
 import ImportHeader from "../components/import_reviews/importHeader";
 import ImportBody from "../components/import_reviews/importBody";
 
 export const loader = async ({ request }) => {
-  console.log("----------Import review page loaded---------");
-  const host = getHost(request);
-  const apiKey = process.env.SHOPIFY_API_KEY;
+  console.log("------/app/importReview loaded---------");
+  const session = await authenticate.admin(request);
+  if (!session) {
+    console.error("Session not found >>> ", session);
+  }
 
-  return json({ host, apiKey });
+  return null;
 };
 
 export default function AdditionalPage() {
-  const dataLoaded = useLoaderData();
+  const app = useAppBridge();
   const [data, setData] = useState(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const app = InitShopifyApp(dataLoaded.host, dataLoaded.apiKey);
-        const accessToken = await getSession(app);
-
+        const accessToken = await app.idToken();
         const response = await fetch("http://localhost:8080/getShopInfo", {
           method: "GET",
           headers: {
@@ -44,6 +30,7 @@ export default function AdditionalPage() {
           },
         });
         const products = await response.json();
+        // console.log(products);
         setData(products.finalProductInfo);
       } catch (error) {
         console.error("Load product from Backend get Bug >>>> ", error);

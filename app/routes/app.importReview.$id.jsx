@@ -1,23 +1,13 @@
-import { useLoaderData } from "@remix-run/react";
-import { Page, Box, Button } from "@shopify/polaris";
+import { Page } from "@shopify/polaris";
+import { authenticate } from "../shopify.server";
 
-export const loader = async ({ params }) => {
-  const { id } = params;
-  console.log(id);
-  return { id };
+export const loader = async ({ request }) => {
+  console.log("<<<< Go to import page >>>>>");
+  await authenticate.admin(request);
+
+  return null;
 };
 
-export default function ImportReviews({ onClick }) {
-  const id = useLoaderData();
-
-  // console.log(id);
-
-  return (
-    <Page>
-      <Button onClick={onClick} url="/app/importReview">
-        Back
-      </Button>
-      Hello World
-    </Page>
-  );
+export default function ImportView() {
+  return <Page>Hello world!!</Page>;
 }
