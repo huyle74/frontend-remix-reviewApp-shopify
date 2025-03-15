@@ -1,0 +1,103 @@
+.Polaris-Tabs__TabContainer:hover {
+  border-bottom: 2px rgb(137, 137, 137) solid;
+}
+
+.Polaris-Tabs__TabContainer button {
+  border-radius: 0%;
+}
+
+.Polaris-Tabs__TabContainer {
+  border-bottom: 2px #f1f1f1 solid;
+}
+
+.header-table-button button {
+  margin: 0.2rem;
+}
+
+.header-table-button span {
+  font-weight: 700;
+}
+
+.button-number {
+  margin-left: 5px;
+  color: rgb(98, 0, 20);
+}
+
+.import-review-table thead {
+  background-color: aqua;
+}
+
+.import-review-button button {
+  color: rgb(255, 255, 255);
+  background-color: black;
+  width: 120px;
+}
+
+.import-page-title-overview {
+  margin-bottom: 10px;
+  border-bottom: 1px solid #636363;
+}
+
+/* <!-- HTML !--> */
+/* <button class="button-50" role="button">Button 50</button> */
+
+/* CSS */
+.select-source-button button {
+  appearance: button;
+  background-color: #ffffff;
+  background-image: none;
+  border: 1px solid #777777;
+  border-radius: 4px;
+  box-shadow:
+    #000000 4px 4px 0 0,
+    #ffffff 4px 4px 0 1px;
+  box-sizing: border-box;
+  color: #000000;
+  cursor: pointer;
+  display: inline-block;
+  font-family: ITCAvantGardeStd-Bk, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 5px;
+  margin: 0 5px 10px 0;
+  overflow: visible;
+  padding: 8px 20px;
+  text-align: center;
+  text-transform: none;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  vertical-align: middle;
+  white-space: nowrap;
+  width: 5rem;
+}
+
+.select-source-button button:focus {
+  text-decoration: none;
+}
+
+.select-source-button button:hover {
+  text-decoration: none;
+}
+
+.select-source-button button:active {
+  box-shadow: rgba(0, 0, 0, 0.125) 0 3px 5px inset;
+  outline: 0;
+}
+
+.select-source-button button:not([disabled]):active {
+  box-shadow:
+    #fff 2px 2px 0 0,
+    #000 2px 2px 0 1px;
+  transform: translate(2px, 2px);
+}
+
+.amazon-source-component button {
+  border-radius: 0%;
+}
+
+@media (min-width: 768px) {
+  .select-source-button button {
+    padding: 12px 50px;
+  }
+}

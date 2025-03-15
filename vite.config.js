@@ -52,6 +52,9 @@ export default defineConfig({
       allow: ["app", "node_modules"],
     },
   },
+  define: {
+    "process.env.APP_URL": `"${process.env.APP_URL}"`,
+  },
   plugins: [
     remix({
       ignoredRouteFiles: ["**/.*"],

@@ -22,4 +22,8 @@ module.exports = {
     /^@react-spectrum/,
     /^@spectrum-icons/,
   ],
+  assetsBuildDirectory: "build/client", // ✅ Matches Express config
+  serverBuildPath: "build/server/index.js",
+  publicPath: "/assets/", // ✅ This ensures assets are correctly loaded
+  ignoredRouteFiles: ["**/.*"],
 };

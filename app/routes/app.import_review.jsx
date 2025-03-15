@@ -6,7 +6,7 @@ import ImportHeader from "../components/import_reviews/importHeader";
 import ImportBody from "../components/import_reviews/importBody";
 
 export const loader = async ({ request }) => {
-  console.log("------/app/importReview loaded---------");
+  console.log("------/app/importReview loaded");
   const session = await authenticate.admin(request);
   if (!session) {
     console.error("Session not found >>> ", session);
@@ -30,7 +30,6 @@ export default function AdditionalPage() {
           },
         });
         const products = await response.json();
-        // console.log(products);
         setData(products.finalProductInfo);
       } catch (error) {
         console.error("Load product from Backend get Bug >>>> ", error);

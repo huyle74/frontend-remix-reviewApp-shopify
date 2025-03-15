@@ -1,15 +1,17 @@
 import { useState, useEffect, useCallback } from "react";
-import { Box, IndexTable, Card, Text, Button } from "@shopify/polaris";
+import { Box, IndexTable, Card, Text, Icon } from "@shopify/polaris";
 import TableHeader from "./tableHeader";
 import ImportButton from "./importButton";
+import { starTable, starTableNoFill } from "../../utils/icon";
 
-export default function ImportBody({ data, host }) {
+export default function ImportBody({ data }) {
   const [productInfo, setProductInfo] = useState([]);
   const [headerData, setHeaderData] = useState({
     products: 0,
     reviews: 0,
     noReviews: 0,
   });
+  const [loading, setLoading] = useState(false);
   const [rowsMarkup, setRowsMarkup] = useState(null);
   const [sort, setSort] = useState("asc");
 
@@ -74,11 +76,7 @@ export default function ImportBody({ data, host }) {
           <IndexTable.Cell>
             <Box style={{ display: "flex", alignItems: "center" }}>
               <img
-                src={
-                  dt.totalReviews
-                    ? "https://cdn-icons-png.flaticon.com/512/541/541415.png"
-                    : "https://www.iconpacks.net/icons/1/free-star-icon-984-thumb.png"
-                }
+                src={dt.totalReviews ? starTable : starTableNoFill}
                 alt="star icon"
                 style={{
                   objectFit: "cover",
@@ -95,18 +93,13 @@ export default function ImportBody({ data, host }) {
           <IndexTable.Cell>{dt.totalReviews}</IndexTable.Cell>
           <IndexTable.Cell>{dt.createAt}</IndexTable.Cell>
           <IndexTable.Cell>
-            <ImportButton
-              id={dt.id}
-              host={host}
-            />
+            <ImportButton id={dt.id} />
           </IndexTable.Cell>
         </IndexTable.Row>
       ));
       setRowsMarkup(rows);
     }
   }, [productInfo]);
-
-
 
   const handleSorted = useCallback(
     (index) => {
