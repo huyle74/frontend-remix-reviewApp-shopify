@@ -9,25 +9,38 @@ import {
   Icon,
   Text,
 } from "@shopify/polaris";
+import { useAppBridge, Modal, TitleBar } from "@shopify/app-bridge-react";
 import { AlertTriangleIcon } from "@shopify/polaris-icons";
-import { amazonLogo } from "../../utils/icon";
 import SpinnerLoading from "./spinnerLoading";
-import styles from "./Button.module.css";
-import { checkUrlAmazon } from "../../utils/checkUrl";
 
-export default function AmazonSource({ onClick, shop_id }) {
+export default function SourcePlatform({
+  onClick,
+  shop_id,
+  sourceName,
+  logo,
+  backgroundColor,
+  checkValidUrl,
+  api,
+  billing,
+}) {
+  const shopify = useAppBridge();
   const [url, setUrl] = useState("");
   const [validateUrl, setValidateUrl] = useState(true);
   const [fetchReviews, setFetchReviews] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = useCallback(() => {
-    if (!fetchReviews) return setFetchReviews(true);
-  }, []);
+  const handleSubmit = () => {
+    if (fetchReviews === false && validateUrl === true && url.length !== 0) {
+      setFetchReviews(true);
+    }
+  };
 
-  const handleUrlChange = useCallback((value) => {
-    setUrl(value);
-  }, []);
+  const handleUrlChange = useCallback(
+    (value) => {
+      setUrl(value);
+    },
+    [url],
+  );
 
   useEffect(() => {
     const getReviews = async () => {
@@ -35,16 +48,21 @@ export default function AmazonSource({ onClick, shop_id }) {
         if (url.length !== 0 && validateUrl && fetchReviews) {
           console.log("Valid URL >>> ", url);
           await fetch(
-            `http://localhost:8080/amazonCrawling?shop_id=${shop_id}&url=${url}`,
+            `http://localhost:8080/${api}?shop_id=${shop_id}&url=${url}&billing=${billing}`,
             {
               method: "POST",
             },
           )
             .then((res) => res.json())
             .then((data) => {
-              console.log(data.reviews);
-              setFetchReviews(false);
-              navigate("/app/preview", { state: data.reviews }); // Redirect to preview page
+              console.log(data);
+              if (data.reviews.length !== 0) {
+                navigate("/app/preview", { state: data.reviews });
+              } else {
+                shopify.modal.show("error");
+                setFetchReviews(false);
+                return;
+              }
             });
         }
       } catch (error) {
@@ -56,7 +74,8 @@ export default function AmazonSource({ onClick, shop_id }) {
 
   useEffect(() => {
     if (url.length !== 0) {
-      const checkUrl = checkUrlAmazon(url);
+      const checkUrl = checkValidUrl(url);
+      console.log(checkUrl);
       setValidateUrl(checkUrl);
     }
   }, [url]);
@@ -72,12 +91,16 @@ export default function AmazonSource({ onClick, shop_id }) {
           }}
         >
           <img
-            src={amazonLogo}
+            src={logo}
             alt="amazon logo"
             style={{ objectFit: "cover", height: "30px" }}
           />
-          <Box style={{ marginLeft: "auto" }}>
-            <button className={styles.button} role="button" onClick={onClick}>
+          <Box style={{ marginLeft: "auto" }} className="import-link-button">
+            <button
+              role="button"
+              onClick={onClick}
+              style={{ backgroundColor: `${backgroundColor}` }}
+            >
               X close
             </button>
           </Box>
@@ -87,7 +110,7 @@ export default function AmazonSource({ onClick, shop_id }) {
             <TextField
               value={url}
               onChange={handleUrlChange}
-              label="Enter Amazon Product URL"
+              label={`Enter ${sourceName} Product URL`}
               type="url"
               autoComplete="off"
               onFocus={(e) => {
@@ -95,7 +118,7 @@ export default function AmazonSource({ onClick, shop_id }) {
               }}
             />
             <Box>
-              {!validateUrl && (
+              {validateUrl === false && (
                 <Box
                   style={{
                     display: "flex",
@@ -106,28 +129,38 @@ export default function AmazonSource({ onClick, shop_id }) {
                     <Icon source={AlertTriangleIcon} tone="critical" />
                   </Box>
                   <Text tone="critical">
-                    Invalid amazon product URL. Please re-enter product link.
+                    Invalid {sourceName} product URL. Please re-enter product
+                    link.
                   </Text>
                 </Box>
               )}
             </Box>
-            <button
-              className={styles.button}
-              role="button"
-              style={{
-                marginTop: "10px",
-                padding: 0,
-                width: "120px",
-                marginLeft: "20px",
-              }}
-              type="submit"
-            >
-              Get reviews
-            </button>
+            <Box className="import-link-button">
+              <button
+                role="button"
+                style={{
+                  margin: "0 0 20px 20px",
+                  padding: 0,
+                  width: "120px",
+                  backgroundColor: `${backgroundColor}`,
+                }}
+                type="submit"
+              >
+                Get reviews
+              </button>
+            </Box>
           </FormLayout>
         </Form>
-        <SpinnerLoading loading={fetchReviews} />
+        <SpinnerLoading
+          loading={fetchReviews === true && validateUrl === true}
+        />
       </Card>
+      <Modal id="error">
+        <p style={{ margin: "1.5rem 0 1.5rem 1.5rem" }}>
+          Please wait 1 minute and try again!
+        </p>
+        <TitleBar Title="Cannot get Reviews"></TitleBar>
+      </Modal>
     </Box>
   );
 }

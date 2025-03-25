@@ -1,6 +1,5 @@
 import { Link, Outlet, useLoaderData, useRouteError } from "@remix-run/react";
 import { boundary } from "@shopify/shopify-app-remix/server";
-import { AppProvider } from "@shopify/shopify-app-remix/react";
 import { PolarisProvider } from "../components/PolarisProvider";
 import { NavMenu } from "@shopify/app-bridge-react";
 import polarisStyles from "@shopify/polaris/build/esm/styles.css?url";
@@ -9,7 +8,10 @@ import { authenticate } from "../shopify.server";
 export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 
 export const loader = async ({ request }) => {
-  await authenticate.admin(request);
+  const { billing, redirect } = await authenticate.admin(request);
+  const { hasActivePayment } = await billing.check();
+
+  console.log("check Payment ==> ", hasActivePayment);
 
   return { apiKey: process.env.SHOPIFY_API_KEY || "" };
 };
@@ -23,8 +25,8 @@ export default function App() {
         <Link to="/app" rel="home">
           Home
         </Link>
-        <Link to="/app/import_review">Import Reviews</Link>
-        <Link to="/app/manageReview">Manage reviews</Link>
+        <Link to="/app/import_review">Get Reviews</Link>
+        <Link to="/app/pricing">Pricing</Link>
       </NavMenu>
       <Outlet />
     </PolarisProvider>

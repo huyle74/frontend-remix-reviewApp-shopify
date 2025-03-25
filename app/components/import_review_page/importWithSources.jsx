@@ -1,11 +1,11 @@
 import { Box, Card, Text } from "@shopify/polaris";
 import ImportSources from "./importSources";
-import { amazonIcon, aliExpressIcon, excelIcon } from "../../utils/icon";
+import { amazonIcon, aliExpressIcon, temuLogo } from "../../utils/icon";
 
 export default function ImportWithSources({
   amazonClick,
   aliExpressClick,
-  csvClick,
+  temuClick,
   amazonLoading,
   aliExpressLoading,
   csvLoading,
@@ -36,11 +36,11 @@ export default function ImportWithSources({
             />
           </Box>
           <ImportSources
-            thumbnail={excelIcon}
-            sourceName={"CSV file"}
+            thumbnail={temuLogo}
+            sourceName={"Temu"}
             width={"48%"}
             marginLeft={"0"}
-            onClick={csvClick}
+            onClick={temuClick}
             loading={csvLoading}
           />
         </Box>

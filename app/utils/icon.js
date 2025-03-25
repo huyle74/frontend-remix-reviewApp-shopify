@@ -16,3 +16,9 @@ export const starTableNoFill =
   "https://www.iconpacks.net/icons/1/free-star-icon-984-thumb.png";
 export const amazonLogo =
   "https://cdn.freebiesupply.com/images/large/2x/amazon-logo-black-transparent.png";
+export const temuLogo =
+  "https://aimg.kwcdn.com/upload_aimg/th/17118177-aa57-4cb7-bd96-3dea184a6a83.png";
+export const aliExpressLogo =
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Aliexpress_logo.svg/1280px-Aliexpress_logo.svg.png";
+export const temuWord =
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Temu_logo.svg/1024px-Temu_logo.svg.png";

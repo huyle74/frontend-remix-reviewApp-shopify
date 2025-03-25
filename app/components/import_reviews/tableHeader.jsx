@@ -13,7 +13,7 @@ export default function TableHeader({ allProduct, reviews, noReviews }) {
           All Products <span className="button-number">{allProduct}</span>
         </Button>
       </Box>
-      <Box padding={"150"} className="header-table-button">
+      {/* <Box padding={"150"} className="header-table-button">
         <Button>
           Reviews
           <span className="button-number">{reviews}</span>
@@ -24,7 +24,7 @@ export default function TableHeader({ allProduct, reviews, noReviews }) {
           No reviews
           <span className="button-number">{noReviews}</span>
         </Button>
-      </Box>
+      </Box> */}
     </Box>
   );
 }

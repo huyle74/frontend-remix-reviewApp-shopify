@@ -7,14 +7,18 @@ import { Page, Collapsible } from "@shopify/polaris";
 import { authenticate } from "../shopify.server";
 import ImportReviewBody from "../components/import_review_page/importReviewBody";
 import ImportWithSources from "../components/import_review_page/importWithSources";
-import AmazonSource from "../components/import_review_page/amazonSource";
+import SourcePlatform from "../components/import_review_page/platform.source";
+import { checkUrlAmazon, checkUrlAliExpress } from "../utils/checkUrl";
+import { amazonLogo, aliExpressLogo, temuWord } from "../utils/icon";
 
 export const loader = async ({ request }) => {
   console.log("/app/import_review_product >>>>>");
-  const { admin, session } = await authenticate.admin(request);
+  const { admin, session, billing } = await authenticate.admin(request);
   const url = new URL(request.url);
   const id = url.searchParams.get("productId");
-  const shop_id = session.id.replace(/^offline_/, "");
+  const shop_id = session.id.match(/offline_(.*?)\.myshopify\.com/)?.[1];
+  const bill = await billing.check();
+  const checkBilling = bill.hasActivePayment;
 
   const response = await admin.graphql(
     `query shopInfo {
@@ -35,16 +39,16 @@ export const loader = async ({ request }) => {
     }`,
   );
   const product = await response.json();
-
   return {
     apiKey: process.env.SHOPIFY_API_KEY,
     product: product.data.product,
     shop_id,
+    billing: checkBilling,
   };
 };
 
-export default function ImportView() {
-  const { apiKey, product, shop_id } = useLoaderData();
+export default function GetReview() {
+  const { apiKey, product, shop_id, billing } = useLoaderData();
   const [searchParams] = useSearchParams();
   const [productReview, setProductReview] = useState(null);
   const [isLoaded, setIsLoaded] = useState([false, false, false]);
@@ -54,7 +58,7 @@ export default function ImportView() {
   const productId = searchParams.get("productId");
 
   useEffect(() => {
-    const fetchProductReview = async () => {
+    (async () => {
       const response = await fetch(
         `http://localhost:8080/getProduct?productId=${productId}`,
         {
@@ -63,22 +67,52 @@ export default function ImportView() {
       );
       const reviews = await response.json();
       setProductReview(reviews);
-    };
-
-    fetchProductReview();
+    })();
   }, []);
 
   const handleClickSelect = (source) => {
     switch (source) {
       case "amazon":
         setIsLoaded([true, false, false]);
-        setSource(<AmazonSource onClick={handleGoBack} shop_id={shop_id} />);
+        setSource(
+          <SourcePlatform
+            onClick={handleGoBack}
+            shop_id={shop_id}
+            sourceName={"Amazon"}
+            logo={amazonLogo}
+            checkValidUrl={checkUrlAmazon}
+            api={"amazonCrawling"}
+            billing={billing}
+          />,
+        );
         break;
       case "aliExpress":
         setIsLoaded([false, true, false]);
+        setSource(
+          <SourcePlatform
+            onClick={handleGoBack}
+            shop_id={shop_id}
+            sourceName={"AliExpress"}
+            logo={aliExpressLogo}
+            backgroundColor={"#e62f05"}
+            checkValidUrl={checkUrlAliExpress}
+            api={"crawlAliExpress"}
+            billing={billing}
+          />,
+        );
         break;
-      case "csv":
+      case "temu":
         setIsLoaded([false, false, true]);
+        setSource(
+          <SourcePlatform
+            onClick={handleGoBack}
+            shop_id={shop_id}
+            sourceName={"Temu"}
+            logo={temuWord}
+            backgroundColor={"#ff6d00"}
+            billing={billing}
+          />,
+        );
         break;
       default:
         break;
@@ -110,7 +144,7 @@ export default function ImportView() {
             csvLoading={isLoaded[2]}
             amazonClick={() => handleClickSelect("amazon")}
             aliExpressClick={() => handleClickSelect("aliExpress")}
-            csvClick={() => handleClickSelect("csv")}
+            temuClick={() => handleClickSelect("temu")}
           />
         </Collapsible>
         {source}
