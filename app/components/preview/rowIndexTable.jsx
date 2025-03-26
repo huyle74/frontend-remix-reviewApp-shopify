@@ -24,11 +24,11 @@ export default function RowIndexTable({ reviews, onClick, selectedResources }) {
           return (
             <IndexTable.Row
               id={id}
-              key={id}
+              key={`${id}-${index}`}
               selected={selectedResources?.includes(id)}
               position={index}
               accessibilityLabel="Review detail"
-              onClick={(e) => {}}
+              onClick={() => {}}
             >
               <IndexTable.Cell>
                 <div
@@ -38,7 +38,6 @@ export default function RowIndexTable({ reviews, onClick, selectedResources }) {
                     display: "flex",
                     flexDirection: "column",
                     zIndex: 1000,
-                    transition: "1s ease",
                   }}
                 >
                   <RatingStar rating={rating} />
@@ -46,7 +45,7 @@ export default function RowIndexTable({ reviews, onClick, selectedResources }) {
                   <ImagesReview images={review_image} />
                 </div>
               </IndexTable.Cell>
-              <div style={{ transition: "1s ease" }}>
+              <div>
                 <IndexTable.Cell>
                   <Box
                     style={{
@@ -56,7 +55,11 @@ export default function RowIndexTable({ reviews, onClick, selectedResources }) {
                     }}
                   >
                     <div style={{ margin: "0 10px 0 0" }}>
-                      <Avatar source={avatar} name={review_name} initials="user" />
+                      <Avatar
+                        source={avatar}
+                        name={review_name}
+                        initials="user"
+                      />
                     </div>
                     <Text>
                       {review_name.length > 15
@@ -65,7 +68,7 @@ export default function RowIndexTable({ reviews, onClick, selectedResources }) {
                     </Text>
                   </Box>
                   <Box style={{ display: "flex" }}>
-                    Reviewed in&nbsp; <span> </span>
+                    Reviewed in&nbsp;
                     <Text fontWeight="bold" tone="magic-subdued">
                       {nation}
                     </Text>

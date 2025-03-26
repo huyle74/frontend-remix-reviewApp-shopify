@@ -84,14 +84,37 @@ export default function AdditionalPage() {
     }
   };
 
+  const handleSearchByName = async (value) => {
+    try {
+      setLoading(true);
+      const accessToken = await app.idToken();
+      const response = await fetch(
+        `${url}/searchProductByTitle?searchTerm=${value}`,
+        {
+          method: "POST",
+          headers: { authorization: `Bearer ${accessToken}` },
+        },
+      );
+      const { finalProductInfo, pageInfo, success } = await response.json();
+      if (success) {
+        setData({ finalProductInfo, pageInfo });
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("CANNOT SEARCH PRODUCT >> ", error);
+    }
+  };
+
   return (
-    <Page fullWidth>
+    <Page>
       <ImportHeader />
       <ImportBody
         data={data}
         handlePagination={handlePagination}
         loading={loading}
         handleSort={handleSortByName}
+        searchLoading={loading}
+        handleSearch={handleSearchByName}
       />
     </Page>
   );

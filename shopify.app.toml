@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "72da450e4e3eead6f7b5d1e266d6d7c7"
-application_url = "https://length-ron-prepaid-pillow.trycloudflare.com"
+application_url = "https://rid-rt-console-investors.trycloudflare.com"
 embedded = true
 name = "remix-frontend-review-app"
 handle = "remix-frontend-review-app"
@@ -28,9 +28,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://length-ron-prepaid-pillow.trycloudflare.com/auth/callback",
-  "https://length-ron-prepaid-pillow.trycloudflare.com/auth/shopify/callback",
-  "https://length-ron-prepaid-pillow.trycloudflare.com/api/auth/callback"
+  "https://rid-rt-console-investors.trycloudflare.com/auth/callback",
+  "https://rid-rt-console-investors.trycloudflare.com/auth/shopify/callback",
+  "https://rid-rt-console-investors.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]

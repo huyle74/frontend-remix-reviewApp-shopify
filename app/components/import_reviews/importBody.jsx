@@ -1,21 +1,17 @@
-import { useState, useEffect, useCallback } from "react";
-import { Box, IndexTable, Card, Text, Icon } from "@shopify/polaris";
+import { useState, useEffect } from "react";
+import { Box, IndexTable, Card, Text } from "@shopify/polaris";
 import TableHeader from "./tableHeader";
 import ImportButton from "./importButton";
-import { starTable, starTableNoFill } from "../../utils/icon";
 
 export default function ImportBody({
   data,
   handlePagination,
   loading,
   handleSort,
+  handleSearch,
+  searchLoading,
 }) {
   const [productInfo, setProductInfo] = useState([]);
-  const [headerData, setHeaderData] = useState({
-    products: 0,
-    reviews: 0,
-    noReviews: 0,
-  });
   const [rowsMarkup, setRowsMarkup] = useState(null);
   const [sort, setSort] = useState(true);
   const [pagination, setPagination] = useState([
@@ -43,13 +39,6 @@ export default function ImportBody({
           totalReviews++;
         }
       }
-      const allProducts = data.length;
-      const noReviews = allProducts - totalReviews;
-      setHeaderData({
-        reviews: totalReviews,
-        noReviews: noReviews,
-        products: allProducts,
-      });
     }
   }, [data]);
 
@@ -86,7 +75,6 @@ export default function ImportBody({
                   }}
                 />
               </Box>
-
               <Text>{dt.title}</Text>
             </Box>
           </IndexTable.Cell>
@@ -103,7 +91,11 @@ export default function ImportBody({
   return (
     <Box>
       <Card>
-        <TableHeader allProduct={productInfo.length} />
+        <TableHeader
+          allProduct={productInfo.length}
+          searchLoading={searchLoading}
+          handleSearch={handleSearch}
+        />
         <IndexTable
           loading={loading}
           className="import-review-table"
@@ -112,7 +104,6 @@ export default function ImportBody({
             setSort(!sort);
           }}
           selectable={false}
-          sortable={[true, true, true, true]}
           itemCount={productInfo?.length}
           headings={[{ title: "Products" }, { title: "" }]}
           pagination={{

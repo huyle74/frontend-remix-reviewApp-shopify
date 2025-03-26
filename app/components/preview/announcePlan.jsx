@@ -1,5 +1,14 @@
-import { Box } from "@shopify/polaris";
+import { Box, Text } from "@shopify/polaris";
 
-export default function AnnouncePlan() {
-  return <Box>You are on Free plan</Box>;
+export default function AnnouncePlan({ billing }) {
+  const planName = billing == true ? "Premium" : "Free";
+  return (
+    <Box style={{ display: "flex" }}>
+      You are on&nbsp;
+      <Text tone="magic-subdued" fontWeight="bold">
+        {planName}
+      </Text>
+      &nbsp;plan
+    </Box>
+  );
 }

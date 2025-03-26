@@ -1,11 +1,21 @@
-import { Box, Button } from "@shopify/polaris";
+import { useState, useCallback } from "react";
+import { Box, Button, TextField, Form, FormLayout } from "@shopify/polaris";
+import { SearchIcon } from "@shopify/polaris-icons";
 
-export default function TableHeader({ allProduct, reviews, noReviews }) {
+export default function TableHeader({
+  allProduct,
+  handleSearch,
+  searchLoading,
+}) {
+  const [value, setValue] = useState("");
+  const handleChange = useCallback((value) => setValue(value), []);
+  
   return (
-    <Box
+    <div
       style={{
         display: "flex",
         marginBottom: "10px",
+        justifyContent: "space-between",
       }}
     >
       <Box padding={"150"} className="header-table-button">
@@ -13,18 +23,22 @@ export default function TableHeader({ allProduct, reviews, noReviews }) {
           All Products <span className="button-number">{allProduct}</span>
         </Button>
       </Box>
-      {/* <Box padding={"150"} className="header-table-button">
-        <Button>
-          Reviews
-          <span className="button-number">{reviews}</span>
-        </Button>
-      </Box>
-      <Box padding={"150"} className="header-table-button">
-        <Button>
-          No reviews
-          <span className="button-number">{noReviews}</span>
-        </Button>
-      </Box> */}
-    </Box>
+      <Form onSubmit={() => handleSearch(value)}>
+        <FormLayout>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <div style={{ marginRight: "5px" }}>
+              <Button submit icon={SearchIcon} variant="tertiary" />
+            </div>
+            <TextField
+              placeholder="Search by product name"
+              value={value}
+              onChange={handleChange}
+              autoComplete="off"
+              loading={searchLoading}
+            />
+          </div>
+        </FormLayout>
+      </Form>
+    </div>
   );
 }

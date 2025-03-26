@@ -4,7 +4,6 @@ export default function OverviewReview({ title, number }) {
   return (
     <Box
       style={{
-        // marginLeft: "60px",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",

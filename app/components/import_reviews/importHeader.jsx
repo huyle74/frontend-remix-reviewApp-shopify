@@ -1,4 +1,4 @@
-import { Box, Text, Button } from "@shopify/polaris";
+import { Box, Text } from "@shopify/polaris";
 
 export default function ImportHeader() {
   return (
@@ -6,9 +6,6 @@ export default function ImportHeader() {
       <Text variant="headingLg" as="h2">
         Import Reviews
       </Text>
-      <Box style={{ marginLeft: "auto" }}>
-        <Button variant="secondary">Import CSV file</Button>
-      </Box>
     </Box>
   );
 }
