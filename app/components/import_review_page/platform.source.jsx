@@ -22,6 +22,7 @@ export default function SourcePlatform({
   checkValidUrl,
   api,
   billing,
+  productId
 }) {
   const shopify = useAppBridge();
   const [url, setUrl] = useState("");
@@ -46,18 +47,16 @@ export default function SourcePlatform({
     const getReviews = async () => {
       try {
         if (url.length !== 0 && validateUrl && fetchReviews) {
-          console.log("Valid URL >>> ", url);
           await fetch(
-            `http://localhost:8080/${api}?shop_id=${shop_id}&url=${url}&billing=${billing}`,
+            `http://localhost:8080/api/${api}?shop_id=${shop_id}&url=${url}&billing=${billing}&shopify_product_id=${productId}`,
             {
               method: "POST",
             },
           )
             .then((res) => res.json())
             .then((data) => {
-              console.log(data);
               if (data.reviews.length !== 0) {
-                navigate("/app/preview", { state: data.reviews });
+                navigate("/app/preview", { state: data });
               } else {
                 shopify.modal.show("error");
                 setFetchReviews(false);
@@ -75,7 +74,6 @@ export default function SourcePlatform({
   useEffect(() => {
     if (url.length !== 0) {
       const checkUrl = checkValidUrl(url);
-      console.log(checkUrl);
       setValidateUrl(checkUrl);
     }
   }, [url]);

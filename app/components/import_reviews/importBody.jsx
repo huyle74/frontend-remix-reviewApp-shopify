@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
-import { Box, IndexTable, Card, Text } from "@shopify/polaris";
+import { useState, useEffect, useCallback } from "react";
+import { Box, IndexTable, Card, Text, Button } from "@shopify/polaris";
 import TableHeader from "./tableHeader";
 import ImportButton from "./importButton";
+import ViewButton from "./viewButton";
 
 export default function ImportBody({
   data,
@@ -11,8 +12,8 @@ export default function ImportBody({
   handleSearch,
   searchLoading,
 }) {
+  const [loadingButton, setLoadingButton] = useState(false);
   const [productInfo, setProductInfo] = useState([]);
-  const [rowsMarkup, setRowsMarkup] = useState(null);
   const [sort, setSort] = useState(true);
   const [pagination, setPagination] = useState([
     { previous: false, cursor: null },
@@ -42,51 +43,57 @@ export default function ImportBody({
     }
   }, [data]);
 
-  useEffect(() => {
-    if (productInfo.length) {
-      const rows = productInfo.map((dt, index) => (
-        <IndexTable.Row key={dt.id} id={dt.id} position={index}>
-          <IndexTable.Cell>
-            <Box
+  const rows = productInfo.map((dt, index) => (
+    <IndexTable.Row key={dt.id} id={dt.id} position={index}>
+      <IndexTable.Cell>
+        <Box
+          style={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            style={{
+              display: "flex",
+              width: "10%",
+              justifyContent: "center",
+              marginRight: "10px",
+            }}
+          >
+            <img
+              src={
+                dt.imageUrl.length
+                  ? dt.imageUrl
+                  : "https://media.istockphoto.com/id/1222357475/vector/image-preview-icon-picture-placeholder-for-website-or-ui-ux-design-vector-illustration.jpg?s=612x612&w=0&k=20&c=KuCo-dRBYV7nz2gbk4J9w1WtTAgpTdznHu55W9FjimE="
+              }
+              alt="product Image"
               style={{
-                display: "flex",
-                alignItems: "center",
+                objectFit: "cover",
+                height: "40px",
+                borderRadius: "4px",
               }}
-            >
-              <Box
-                style={{
-                  display: "flex",
-                  width: "10%",
-                  justifyContent: "center",
-                  marginRight: "10px",
-                }}
-              >
-                <img
-                  src={
-                    dt.imageUrl.length
-                      ? dt.imageUrl
-                      : "https://media.istockphoto.com/id/1222357475/vector/image-preview-icon-picture-placeholder-for-website-or-ui-ux-design-vector-illustration.jpg?s=612x612&w=0&k=20&c=KuCo-dRBYV7nz2gbk4J9w1WtTAgpTdznHu55W9FjimE="
-                  }
-                  alt="product Image"
-                  style={{
-                    objectFit: "cover",
-                    height: "40px",
-                    borderRadius: "4px",
-                  }}
-                />
-              </Box>
-              <Text>{dt.title}</Text>
-            </Box>
-          </IndexTable.Cell>
-
-          <IndexTable.Cell>
-            <ImportButton id={dt.id} />
-          </IndexTable.Cell>
-        </IndexTable.Row>
-      ));
-      setRowsMarkup(rows);
-    }
-  }, [productInfo]);
+            />
+          </Box>
+          <Text>{dt.title}</Text>
+        </Box>
+      </IndexTable.Cell>
+      <IndexTable.Cell>{dt.totalReviews}</IndexTable.Cell>
+      <IndexTable.Cell>
+        <div style={{ display: "flex" }}>
+          <ImportButton
+            id={dt.id}
+            onClick={() => setLoadingButton(true)}
+            disabled={loadingButton}
+          />
+          <ViewButton
+            disabled={loadingButton}
+            id={dt.id}
+            onClick={() => setLoadingButton(true)}
+          />
+        </div>
+      </IndexTable.Cell>
+    </IndexTable.Row>
+  ));
 
   return (
     <Box>
@@ -98,14 +105,20 @@ export default function ImportBody({
         />
         <IndexTable
           loading={loading}
+          sortable={[true, true, false]}
           className="import-review-table"
           onSort={() => {
             handleSort(sort);
             setSort(!sort);
+            console.log("clicked");
           }}
           selectable={false}
           itemCount={productInfo?.length}
-          headings={[{ title: "Products" }, { title: "" }]}
+          headings={[
+            { title: "Products" },
+            { title: "Total Reviews" },
+            { title: "Action", alignment: "center" },
+          ]}
           pagination={{
             hasPrevious: pagination[0].previous,
             onPrevious: () => {
@@ -117,7 +130,7 @@ export default function ImportBody({
             },
           }}
         >
-          {rowsMarkup}
+          {rows}
         </IndexTable>
       </Card>
     </Box>

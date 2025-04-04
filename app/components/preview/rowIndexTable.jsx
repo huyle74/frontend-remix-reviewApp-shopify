@@ -4,7 +4,11 @@ import RatingStar from "./ratingStar";
 import ReviewContent from "./reviewContent";
 import ImagesReview from "./imageReview";
 
-export default function RowIndexTable({ reviews, onClick, selectedResources }) {
+export default function RowIndexTable({
+  reviews,
+  deleteById,
+  selectedResources,disabled
+}) {
   return (
     <>
       {reviews.map(
@@ -80,7 +84,7 @@ export default function RowIndexTable({ reviews, onClick, selectedResources }) {
                 </IndexTable.Cell>
               </div>
               <IndexTable.Cell>
-                <Button icon={DeleteIcon} onClick={() => onClick(id)} />
+                <Button icon={DeleteIcon} variant="tertiary" onClick={() => deleteById(id)} disabled={disabled}/>
               </IndexTable.Cell>
             </IndexTable.Row>
           );

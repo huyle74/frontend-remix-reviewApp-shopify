@@ -8,10 +8,8 @@ import { url } from "../utils/config";
 
 export const loader = async ({ request }) => {
   console.log("------/app/importReview loaded");
-  const session = await authenticate.admin(request);
-  if (!session) {
-    console.error("Session not found >>> ", session);
-  }
+  await authenticate.admin(request);
+
   return null;
 };
 
@@ -24,7 +22,7 @@ export default function AdditionalPage() {
     (async () => {
       try {
         const accessToken = await app.idToken();
-        const response = await fetch(`${url}/getShopInfo`, {
+        const response = await fetch(`${url}/shopify/allProducts`, {
           method: "GET",
           headers: {
             authorization: `Bearer ${accessToken}`,
@@ -45,9 +43,8 @@ export default function AdditionalPage() {
     try {
       setLoading(true);
       const accessToken = await app.idToken();
-      console.log(move);
       const response = await fetch(
-        `${url}/paginationProducts?move=${move}&cursor=${cursor}`,
+        `${url}/shopify/pagination?move=${move}&cursor=${cursor}`,
         {
           method: "POST",
           headers: { authorization: `Bearer ${accessToken}` },
@@ -57,8 +54,8 @@ export default function AdditionalPage() {
       if (success) {
         setData({ finalProductInfo, pageInfo });
         setLoading(false);
+        console.log("Clicked");
       }
-      console.log("Clicked");
     } catch (error) {
       console.error("pagination get error >>> ", error);
     }
@@ -69,16 +66,17 @@ export default function AdditionalPage() {
       setLoading(true);
       const accessToken = await app.idToken();
       console.log(order);
-      const response = await fetch(`${url}/sortProductsByName?sort=${order}`, {
+      const response = await fetch(`${url}/shopify/sort?sort=${order}`, {
         method: "POST",
         headers: { authorization: `Bearer ${accessToken}` },
       });
       const { finalProductInfo, pageInfo, success } = await response.json();
+      console.log(success);
       if (success) {
         setData({ finalProductInfo, pageInfo });
         setLoading(false);
+        console.log("Clicked Sorted");
       }
-      console.log("Clicked Sorted");
     } catch (error) {
       console.error("Sort failed >> ", error);
     }
@@ -89,7 +87,7 @@ export default function AdditionalPage() {
       setLoading(true);
       const accessToken = await app.idToken();
       const response = await fetch(
-        `${url}/searchProductByTitle?searchTerm=${value}`,
+        `${url}/shopify/searchTitle?searchTerm=${value}`,
         {
           method: "POST",
           headers: { authorization: `Bearer ${accessToken}` },
@@ -106,7 +104,7 @@ export default function AdditionalPage() {
   };
 
   return (
-    <Page>
+    <Page fullWidth>
       <ImportHeader />
       <ImportBody
         data={data}

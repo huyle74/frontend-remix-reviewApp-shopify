@@ -7,6 +7,7 @@ export default function OverviewReview({ title, number }) {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        margin: "0 2rem 0 2rem",
       }}
     >
       <Box className="import-page-title-overview">

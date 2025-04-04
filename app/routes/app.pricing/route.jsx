@@ -3,9 +3,7 @@ import { useLoaderData } from "@remix-run/react";
 import { Page, Card, Button } from "@shopify/polaris";
 import { authenticate } from "../../shopify.server";
 import { useAppBridge } from "@shopify/app-bridge-react";
-
-const payUrl = "http://localhost:8080/payment_subscription";
-const cancelUrl = "http://localhost:8080/cancel_subscription";
+import { url } from "../../utils/config";
 
 export const loader = async ({ request }) => {
   console.log("--PRICING PAGE--");
@@ -31,7 +29,7 @@ function PricingRoute() {
       (async () => {
         try {
           const accessToken = await shopify.idToken();
-          await fetch(payUrl, {
+          await fetch(`${url}/shopify/subscription`, {
             method: "POST",
             headers: {
               authorization: `Bearer ${accessToken}`,
@@ -50,17 +48,19 @@ function PricingRoute() {
   }, [payment]);
 
   useEffect(() => {
-    // console.log("Cancel: ", cancel);
     if (cancel) {
       (async () => {
         try {
           const accessToken = await shopify.idToken();
-          const response = await fetch(`${cancelUrl}?id=${id}`, {
-            method: "POST",
-            headers: {
-              authorization: `Bearer ${accessToken}`,
+          const response = await fetch(
+            `${url}/shopify/cancelSubscription?id=${id}`,
+            {
+              method: "POST",
+              headers: {
+                authorization: `Bearer ${accessToken}`,
+              },
             },
-          });
+          );
           const { success } = await response.json();
           console.log("Cancel successfully - ", success);
           if (success) {

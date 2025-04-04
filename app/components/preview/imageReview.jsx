@@ -44,10 +44,10 @@ export default function ImagesReview({ images }) {
   return (
     <Box style={{ zIndex: 1000 }}>
       <div style={{ display: "flex" }}>
-        {images.map((img) => {
+        {images.map((img, index) => {
           return (
             <Box
-              key={img}
+              key={`${img}-${index}`}
               style={{ margin: "10px 10px 10px 0" }}
               onClick={() => handleClickImage(img)}
             >

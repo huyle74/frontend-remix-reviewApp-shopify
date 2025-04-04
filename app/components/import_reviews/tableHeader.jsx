@@ -9,7 +9,7 @@ export default function TableHeader({
 }) {
   const [value, setValue] = useState("");
   const handleChange = useCallback((value) => setValue(value), []);
-  
+
   return (
     <div
       style={{
@@ -18,11 +18,9 @@ export default function TableHeader({
         justifyContent: "space-between",
       }}
     >
-      <Box padding={"150"} className="header-table-button">
-        <Button>
-          All Products <span className="button-number">{allProduct}</span>
-        </Button>
-      </Box>
+      <div style={{ margin: "0.5rem" }}>
+        All Products <span className="button-number">{allProduct}</span>
+      </div>
       <Form onSubmit={() => handleSearch(value)}>
         <FormLayout>
           <div style={{ display: "flex", alignItems: "center" }}>

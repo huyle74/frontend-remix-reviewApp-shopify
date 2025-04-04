@@ -7,6 +7,7 @@ export default function LoadingSpinner() {
         position: "absolute",
         left: 0,
         top: 0,
+        bottom: 0,
         backgroundColor: "rgb(1, 0, 0, 0.2)",
         display: "flex",
         alignItems: "center",

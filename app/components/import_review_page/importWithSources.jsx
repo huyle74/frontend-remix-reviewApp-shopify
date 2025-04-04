@@ -35,14 +35,14 @@ export default function ImportWithSources({
               loading={aliExpressLoading}
             />
           </Box>
-          <ImportSources
+          {/* <ImportSources
             thumbnail={temuLogo}
             sourceName={"Temu"}
             width={"48%"}
             marginLeft={"0"}
             onClick={temuClick}
             loading={csvLoading}
-          />
+          /> */}
         </Box>
       </Card>
     </Box>

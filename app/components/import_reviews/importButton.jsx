@@ -2,27 +2,28 @@ import { useState } from "react";
 import { Link } from "@remix-run/react";
 import { Box, Button } from "@shopify/polaris";
 
-export default function ImportButton({ id }) {
+export default function ImportButton({ id, onClick, disabled }) {
   const [loading, setLoading] = useState(false);
-
-  const handleClickButton = () => {
-    setLoading(true);
-  };
 
   return (
     <Box
       style={{
         display: "flex",
         justifyContent: "end",
+        marginRight: "0.5rem",
+        marginLeft: "auto",
       }}
       id={id}
     >
-      <Link
-        className="import-review-button"
-        to={`/app/import_review_product?productId=${id}`}
-      >
-        <Button loading={loading} onClick={handleClickButton}>
-          {loading ? "" : "Import Reviews"}
+      <Link onClick={onClick} style={{ margin: "auto" }}>
+        <Button
+          url={`/app/import_review_product?productId=${id}`}
+          loading={loading}
+          disabled={disabled}
+          // variant="primary"
+          onClick={() => setLoading(true)}
+        >
+          Import reviews
         </Button>
       </Link>
     </Box>

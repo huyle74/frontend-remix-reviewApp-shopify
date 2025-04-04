@@ -9,7 +9,8 @@ import ImportReviewBody from "../components/import_review_page/importReviewBody"
 import ImportWithSources from "../components/import_review_page/importWithSources";
 import SourcePlatform from "../components/import_review_page/platform.source";
 import { checkUrlAmazon, checkUrlAliExpress } from "../utils/checkUrl";
-import { amazonLogo, aliExpressLogo, temuWord } from "../utils/icon";
+import { amazonLogo, aliExpressLogo } from "../utils/icon";
+import { url } from "../utils/config";
 
 export const loader = async ({ request }) => {
   console.log("/app/import_review_product >>>>>");
@@ -60,15 +61,15 @@ export default function GetReview() {
   useEffect(() => {
     (async () => {
       const response = await fetch(
-        `http://localhost:8080/getProduct?productId=${productId}`,
+        `${url}/importReviewPage/getProductInfo?shopify_product_id=${productId}`,
         {
           method: "GET",
         },
       );
-      const reviews = await response.json();
-      setProductReview(reviews);
+      const { productInfo } = await response.json();
+      setProductReview(productInfo[0]);
     })();
-  }, []);
+  }, [productId]);
 
   const handleClickSelect = (source) => {
     switch (source) {
@@ -81,8 +82,9 @@ export default function GetReview() {
             sourceName={"Amazon"}
             logo={amazonLogo}
             checkValidUrl={checkUrlAmazon}
-            api={"amazonCrawling"}
+            api={"amazon/amazonCrawler"}
             billing={billing}
+            productId={productId}
           />,
         );
         break;
@@ -96,21 +98,9 @@ export default function GetReview() {
             logo={aliExpressLogo}
             backgroundColor={"#e62f05"}
             checkValidUrl={checkUrlAliExpress}
-            api={"crawlAliExpress"}
+            api={"aliExpress/aliExpressCrawler"}
             billing={billing}
-          />,
-        );
-        break;
-      case "temu":
-        setIsLoaded([false, false, true]);
-        setSource(
-          <SourcePlatform
-            onClick={handleGoBack}
-            shop_id={shop_id}
-            sourceName={"Temu"}
-            logo={temuWord}
-            backgroundColor={"#ff6d00"}
-            billing={billing}
+            productId={productId}
           />,
         );
         break;
@@ -144,7 +134,6 @@ export default function GetReview() {
             csvLoading={isLoaded[2]}
             amazonClick={() => handleClickSelect("amazon")}
             aliExpressClick={() => handleClickSelect("aliExpress")}
-            temuClick={() => handleClickSelect("temu")}
           />
         </Collapsible>
         {source}

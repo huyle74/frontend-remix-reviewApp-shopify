@@ -6,6 +6,7 @@ import {
   IndexTable,
   Page,
   useIndexResourceState,
+  Text,
 } from "@shopify/polaris";
 import { authenticate } from "../../shopify.server";
 import AnnouncePlan from "../../components/preview/announcePlan";
@@ -14,43 +15,68 @@ import RowIndexTable from "../../components/preview/rowIndexTable";
 import ModalWarning from "../../components/preview/warningModal";
 import LoadingSpinner from "../../components/preview/loadingSpinner";
 import FilterFunction from "../../components/preview/filter";
+import exportCSV from "../../components/preview/exportCSVFile";
+import { url } from "../../utils/config";
 
 export const loader = async ({ request }) => {
-  const { billing } = await authenticate.admin(request);
+  const { billing, session } = await authenticate.admin(request);
   const bill = await billing.check();
   const checkBill = bill.hasActivePayment;
-  return { checkBill };
+  console.log(session);
+  const shop = session.shop.split(".");
+  console.log(shop);
+
+  return { checkBill, shop_id: shop[0] };
 };
 
 export default function PreviewPage() {
   const location = useLocation();
+  let reviews = [],
+    review_id;
+  if (location.state !== null) {
+    reviews = location.state.reviews;
+    review_id = location.state.review_id;
+  }
   const navigate = useNavigate();
   const shopify = useAppBridge();
-  const { checkBill } = useLoaderData();
-  const [initData, setInitData] = useState([]);
-  const [reviews, setReviews] = useState([]);
+  const { checkBill, shop_id } = useLoaderData();
+  const [allReviews, setAllReviews] = useState(reviews);
   const [idSelect, setIdSelect] = useState(null);
-  const [exported, setExported] = useState(false);
-  const [nationArray, setNationArray] = useState(null);
   const [loading, setLoading] = useState(false);
-  // FILTER
+  const [tag, setTag] = useState({
+    nation: [],
+    hasImage: [],
+    hasContent: [],
+    rating: [],
+  });
+  const [resetFilter, setResetFilter] = useState(false);
+
+  // FILTER tag
+  const handleFilterTag = (newReviews) => {
+    const nation = [...new Set(newReviews.map((item) => item.nation))];
+    const rating = [...new Set(newReviews.map((item) => item.rating))].sort(
+      (a, b) => a - b,
+    );
+    const hasImage = newReviews.some((item) => item.review_image.length > 0)
+      ? [true, false]
+      : [];
+    const hasContent = newReviews.some((item) => item.review_content.length > 0)
+      ? [true, false]
+      : [];
+    // console.log(nation, rating, hasImage, hasContent);
+    setTag({ nation, hasImage, hasContent, rating });
+  };
 
   useEffect(() => {
     setLoading(true);
-
     if (location.state === null) {
       navigate("/app/import_review");
     } else {
-      setReviews(location.state);
-      setInitData(location.state);
-      if (new Set(location.state.map((r) => r.id)).size !== reviews.length) {
-        console.warn("🚨 Duplicate or missing IDs found in reviews");
-      }
-      const nation = [...new Set(location.state.map((item) => item.nation))];
-      setNationArray(nation);
+      console.log("total Reviews: ", reviews.length);
+      console.log(reviews);
+      handleFilterTag(reviews);
     }
     const loadingTime = setTimeout(() => {
-      console.log(location.state);
       setLoading(false);
     }, 3000);
     return () => {
@@ -58,79 +84,89 @@ export default function PreviewPage() {
     };
   }, []);
 
-  useEffect(() => {
-    if (exported === true) {
-      const selectedReviews = reviews.filter((review) =>
-        new Set(selectedResources).has(review.id),
-      );
-      const rowCsv = [];
-      const head = Object.keys(selectedReviews[0]);
-      const headers = head.filter((head) => head !== "id" && head !== "avatar");
-      rowCsv.push(headers.join(","));
-
-      selectedReviews.forEach((review) => {
-        const value = headers.map((header) => {
-          console.log(review[header]);
-          return `"${review[header]}"`;
-        });
-        rowCsv.push(value.join(","));
-      });
-      const stringCsv = rowCsv.join("\n");
-      const blob = new Blob([stringCsv], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "review.csv";
-      a.click();
-      URL.revokeObjectURL(url);
-      navigate("/app/import_review_product");
-    }
-  }, [exported]);
-
   const handleDiscard = useCallback(() => navigate(-1), []);
   const {
     selectedResources,
     allResourcesSelected,
     handleSelectionChange,
     clearSelection,
-  } = useIndexResourceState(reviews, {
+  } = useIndexResourceState(allReviews, {
     resourceIDResolver: (review) => review.id,
   });
   const resourceName = {
     singular: "review",
     plural: "reviews",
   };
-  const handleDeleteReviews = useCallback((id) => {
+  const handleDeleteReviews = (id) => {
     shopify.modal.show("delete-review");
     setIdSelect(id);
-  }, []);
+  };
 
-  const handleConfirmDelete = useCallback(() => {
-    const newReviews = initData.filter(
-      (review) => !new Set(selectedResources).has(review.id),
-    );
-    console.log(newReviews);
-    setReviews(newReviews);
-    setInitData(newReviews);
-    shopify.modal.hide("delete-review");
-  }, []);
+  const handleConfirmDelete = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${url}/preview/deleteOnePreview?review_id=${review_id}&id=${idSelect}`,
+        {
+          method: "post",
+        },
+      );
+      const { success, reviews } = await response.json();
+      if (success) {
+        setAllReviews(reviews);
+        handleFilterTag(reviews);
+        handleFilter({ nation: [], rating: [], hasImage: [], hasContent: [] });
+        console.log("All reviews after delete: ", reviews.length);
+        shopify.modal.hide("delete-review");
+        setResetFilter(!resetFilter);
+        clearSelection();
+        setTimeout(() => {
+          setLoading(false);
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Cannot delete review by ID: ", error);
+    }
+  };
 
-  const handleConfirmDeleteBulkAction = useCallback(() => {
-    const newReviews = initData.filter(
-      (review) => !new Set(selectedResources).has(review.id),
-    );
-    console.log("after remove items >> ", newReviews);
-    setReviews(newReviews);
-    setInitData(newReviews);
-    shopify.modal.hide("delete-review-all");
-    clearSelection();
-  }, []);
+  const handleConfirmDeleteBulkAction = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${url}/preview/deleteMultiPreview?review_id=${review_id}`,
+        {
+          method: "post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: selectedResources }),
+        },
+      );
+      const { success, reviews } = await response.json();
+      shopify.modal.hide("delete-review-all");
+      if (success) {
+        handleFilterTag(reviews);
+        setAllReviews(reviews);
+        setResetFilter(!resetFilter);
+        handleFilter({ nation: [], rating: [], hasImage: [], hasContent: [] });
+        clearSelection();
+      }
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Cannot delete selected ID review: ", error);
+    }
+  };
 
-  const handleConfirmExport = useCallback(() => {
-    setExported(true);
+  const handleConfirmExport = () => {
+    exportCSV(allReviews, selectedResources);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 3000);
     shopify.modal.hide("export-reviews");
-    console.log("Confirm export!");
-  }, []);
+  };
 
   const handleModalExport = useCallback(() => {
     if (selectedResources.length === 0) {
@@ -140,51 +176,46 @@ export default function PreviewPage() {
     }
   }, []);
 
-  const handleApplyFilter = (filter) => {
+  const handleFilter = async (filter) => {
     setLoading(true);
-    console.log(initData);
-    const { rating, hasImage, hasContent, nation } = filter;
-    const removeFilter = [rating, hasImage, hasContent, nation].every(
-      (item) => item.length === 0,
-    );
-    console.log(removeFilter);
-    if (!removeFilter) {
-      console.log("clicked");
-      let filterContent, filterImages;
-      const filteredReviews = initData.filter((review) => {
-        const filterNation =
-          nation.length === 0 || nation.includes(review.nation);
-        const filterRating =
-          rating.length === 0 || rating.includes(review.rating);
-        if (hasContent[0]) {
-          filterContent =
-            hasContent.length === 0 || review.review_content.length !== 0;
-        } else {
-          filterContent =
-            hasContent.length === 0 || review.review_content.length === 0;
-        }
-        if (hasImage[0]) {
-          filterImages =
-            hasImage.length === 0 || review.review_image.length !== 0;
-        } else {
-          filterImages =
-            hasImage.length === 0 || review.review_image.length == 0;
-        }
-
-        console.log(filterNation, filterRating, filterContent);
-        return filterNation && filterRating && filterContent && filterImages;
-      });
-      const reviews = [...filteredReviews];
-      console.log(nation, rating, hasContent, hasImage, filteredReviews);
-      const timeout = setTimeout(() => {
-        setReviews(reviews);
+    try {
+      console.log(filter);
+      const response = await fetch(
+        `${url}/preview/filterReviews?review_id=${review_id}`,
+        {
+          method: "post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(filter),
+        },
+      );
+      const { reviews } = await response.json();
+      setAllReviews(reviews);
+      // console.log(reviews);
+      setTimeout(() => {
         setLoading(false);
-      }, 2000);
-    } else {
-      console.log("Clicked");
-      console.log(initData);
-      setReviews(initData);
-      setLoading(false);
+        clearSelection();
+      }, 3000);
+    } catch (error) {
+      console.error("Filter get stuck >>", error);
+    }
+  };
+
+  const handleImportAll = async () => {
+    console.log("Import all Clicked");
+
+    try {
+      const response = await fetch(
+        `${url}/preview/saveReviews?shop_id=${shop_id}&review_id=${review_id}`,
+        {
+          method: "post",
+        },
+      );
+      const { success } = await response.json();
+      if (success) return navigate("/app/import_review");
+    } catch (error) {
+      console.error("Cannot save reviews: ", error);
     }
   };
 
@@ -203,17 +234,19 @@ export default function PreviewPage() {
       }}
       secondaryActions={[
         {
-          content: "Discard",
-          onAction: () => shopify.modal.show("discard-modal"),
+          content: "Import All",
+          onAction: () => shopify.modal.show("import-reviews"),
         },
       ]}
     >
       <div style={{ position: "relative", marginBottom: "30px" }}>
         <Card>
-          {exported === true && <LoadingSpinner />}
+          {loading === true && <LoadingSpinner />}
           <FilterFunction
-            allNation={nationArray}
-            applyFilter={handleApplyFilter}
+            applyFilter={handleFilter}
+            disabled={loading}
+            tagFilter={tag}
+            resetFilter={resetFilter}
           />
           <IndexTable
             promotedBulkActions={[
@@ -228,29 +261,20 @@ export default function PreviewPage() {
             ]}
             loading={loading}
             resourceName={resourceName}
-            itemCount={reviews?.length}
+            itemCount={allReviews?.length}
             headings={[
               {
                 title: (
-                  <div>
-                    All reviews - Total reviews:{" "}
-                    <span style={{ fontWeight: 1000, color: "#d2554a" }}>
-                      {reviews?.length}
-                    </span>
-                  </div>
+                  <span style={{ display: "flex" }}>
+                    All reviews - Total reviews:&nbsp;
+                    <Text fontWeight="bold" tone="critical">
+                      {allReviews?.length}
+                    </Text>
+                  </span>
                 ),
               },
               {
-                title: (
-                  <div
-                    style={{
-                      textAlign: "end",
-                      marginRight: "20px",
-                    }}
-                  >
-                    Action
-                  </div>
-                ),
+                title: "Action",
               },
               { title: "" },
             ]}
@@ -260,9 +284,10 @@ export default function PreviewPage() {
             }
           >
             <RowIndexTable
-              reviews={reviews}
+              reviews={allReviews}
               selectedResources={selectedResources}
-              onClick={(id) => handleDeleteReviews(id)}
+              deleteById={handleDeleteReviews}
+              disabled={loading}
             />
           </IndexTable>
         </Card>
@@ -298,6 +323,14 @@ export default function PreviewPage() {
         id={"export-reviews"}
         button={"Confirm"}
         message={"Are you sure want to export selected reviews?"}
+      />
+      <ModalPreview
+        shopify={shopify}
+        onClick={handleImportAll}
+        title={"Import all Reviews"}
+        id={"import-reviews"}
+        button={"Confirm"}
+        message={"Are you sure want to import all reviews?"}
       />
       <ModalWarning shopify={shopify} />
     </Page>

@@ -39,7 +39,7 @@ export default function ImportReviewBody({ product, review }) {
             <Box
               style={{
                 display: "flex",
-                marginRight: "20px",
+                marginRight: "0.5rem",
                 backgroundColor: "#fff000",
                 padding: "10px",
                 borderRadius: "15px",
@@ -52,16 +52,16 @@ export default function ImportReviewBody({ product, review }) {
                   height: "20px",
                   marginRight: "5px",
                 }}
-                src={review?.averageRating ? star : starNoFill}
+                src={review?.average_rating !== "0" ? star : starNoFill}
                 alt="icon star"
               />
               <Text variant="bodyLg">
-                {review?.averageRating}
-                {review?.totalReviews ? "" : ".0"}
+                {review?.average_rating}
+                {review?.total_reviews ? "" : "0"}
               </Text>
             </Box>
             <Text as="h6" variant="bodyMd">
-              {review?.totalReviews} Published Reviews
+              Rating
             </Text>
           </Box>
         </Box>
@@ -75,15 +75,14 @@ export default function ImportReviewBody({ product, review }) {
           <Box
             style={{
               display: "flex",
-              justifyContent: "space-between",
+              justifyContent: "center",
             }}
           >
             <OverviewReview
               title={"Total Reviews"}
-              number={review?.totalReviews}
+              number={review?.total_reviews}
             />
-            <OverviewReview title={"Photos"} number={90} />
-            <OverviewReview title={"Video"} number={90} />
+            <OverviewReview title={"Photos"} number={review?.total_photos} />
           </Box>
         </Box>
       </Box>

@@ -5,6 +5,7 @@ import { authenticate } from "../shopify.server";
 import MainHeader from "../components/main_page/entrancePageHeader";
 import GridCell from "../components/main_page/displayGrid";
 import BodyMain from "../components/main_page/bodyMain";
+import { url } from "../utils/config";
 
 export const loader = async ({ request }) => {
   console.log("----------Home page------");
@@ -21,13 +22,13 @@ export default function Index() {
 
   useEffect(() => {
     const fetchSession = async () => {
-      try {  
+      try {
         const accessToken = await shopify.idToken();
-        const response = await fetch("http://localhost:8080/getShopInfo", {
+        const response = await fetch(`${url}`, {
           method: "GET",
           headers: {
             authorization: `Bearer ${accessToken}`,
-          },    
+          },
         });
         const products = await response.json();
         // console.log(products);
