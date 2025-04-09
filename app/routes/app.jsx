@@ -22,10 +22,7 @@ export default function App() {
   return (
     <PolarisProvider isEmbeddedApp apiKey={apiKey}>
       <NavMenu>
-        <Link to="/app" rel="home">
-          Home
-        </Link>
-        <Link to="/app/import_review">Get Reviews</Link>
+        <Link to="/app">Get Reviews</Link>
         <Link to="/app/pricing">Pricing</Link>
       </NavMenu>
       <Outlet />

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "@remix-run/react";
-import { Page, SkeletonDisplayText, SkeletonPage } from "@shopify/polaris";
+import { Page } from "@shopify/polaris";
 import { authenticate } from "../shopify.server";
 import ReviewDashboard from "../components/manage_reviews/reviewsDashboard";
 import { url } from "../utils/config";
@@ -18,6 +18,7 @@ export default function MangeReviews() {
   const [review, setReviews] = useState([]);
   const [page, setPage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [nations, setNations] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -28,9 +29,10 @@ export default function MangeReviews() {
             method: "POST",
           },
         );
-        const { reviews, pagination } = await response.json();
+        const { reviews, pagination, nations } = await response.json();
         setReviews(reviews);
         setPage(pagination);
+        setNations(nations);
       } catch (error) {
         console.error(
           "Get product reviews info from database Get bug here >>",
@@ -44,7 +46,7 @@ export default function MangeReviews() {
     <Page
       backAction={{
         content: "Products",
-        url: "/app/import_review",
+        url: "/app",
         onAction: () => setLoading(true),
       }}
       title="Manage Reviews"
@@ -55,6 +57,7 @@ export default function MangeReviews() {
         pagination={page}
         productId={id}
         loading={loading}
+        nations={nations}
       />
     </Page>
   );

@@ -121,7 +121,7 @@ export default function GetReview() {
       <Page
         backAction={{
           content: "Import Reviews",
-          url: "/app/import_review",
+          url: "/app",
         }}
         title="Import Reviews"
         primaryAction={{ content: "Import All", disabled: false }}

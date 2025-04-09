@@ -43,12 +43,14 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "i": "^0.3.7",
+    "i18n-iso-countries": "^7.14.0",
     "isbot": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "npm": "^11.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^7.3.0",
+    "typeorm": "^0.3.22",
     "vite-tsconfig-paths": "^5.0.1"
   },
   "devDependencies": {
@@ -62,7 +64,6 @@
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^10.0.1",
     "prettier": "^3.2.4",
-    "prisma": "^6.5.0",
     "typescript": "^5.2.2",
     "vite": "^5.4.14"
   },

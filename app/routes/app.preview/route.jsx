@@ -63,7 +63,6 @@ export default function PreviewPage() {
     const hasContent = newReviews.some((item) => item.review_content.length > 0)
       ? [true, false]
       : [];
-    // console.log(nation, rating, hasImage, hasContent);
     setTag({ nation, hasImage, hasContent, rating });
   };
 
@@ -213,7 +212,7 @@ export default function PreviewPage() {
         },
       );
       const { success } = await response.json();
-      if (success) return navigate("/app/import_review");
+      if (success) return navigate("/app");
     } catch (error) {
       console.error("Cannot save reviews: ", error);
     }

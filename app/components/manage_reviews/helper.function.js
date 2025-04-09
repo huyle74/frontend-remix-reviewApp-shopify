@@ -1,4 +1,8 @@
 import { url } from "../../utils/config";
+import countries from "i18n-iso-countries";
+import enLocale from "i18n-iso-countries/langs/en.json";
+
+countries.registerLocale(enLocale);
 
 export const formatDate = (input) => {
   const date = new Date(input);
@@ -28,12 +32,11 @@ export const navigateTableData = async ({
   productId,
   sortBy = "id",
   filter = {},
-  cursorBase = {},
-  direction = null,
+  cursor = null,
+  direction = "next",
   order = "ASC",
 }) => {
   try {
-    const { start, id, date = null, rate = null } = cursorBase;
     const {
       hasImage = [],
       hasContent = [],
@@ -50,12 +53,7 @@ export const navigateTableData = async ({
         },
         body: JSON.stringify({
           shopify_product_id: productId,
-          cursor: {
-            id,
-            range: { start },
-            rating: rate,
-            date,
-          },
+          cursor,
           direction,
           sortBy,
           hasImage,
@@ -67,23 +65,29 @@ export const navigateTableData = async ({
       },
     );
     const results = await response.json();
-    // console.log(results);
     return results;
   } catch (error) {
     console.error("Trigger navigation table failed: ", error);
-    return { reviews: [], pagination: null };
+    return { reviews: [], pagination: null, nations: [] };
   }
 };
 
-export const deleteReviews = async (reviewIds) => {
+export const deleteReviewsBackend = async (id, productId) => {
   try {
-    const response = await fetch(`${url}/manage/deleteReviews`, {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
+    console.log(id, productId);
+    const response = await fetch(
+      `${url}/manage/deleteReviews?shopify_product_id=${productId}&id=${id}`,
+      {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id,
+          shopify_product_id: productId,
+        }),
       },
-      body: JSON.stringify({ reviewIds }),
-    });
+    );
     const results = await response.json();
     return results;
   } catch (error) {
@@ -91,4 +95,54 @@ export const deleteReviews = async (reviewIds) => {
   } finally {
     return null;
   }
+};
+
+export function exportCSV(reviews, selectedResources) {
+  const selectedReviews = reviews.filter((review) =>
+    new Set(selectedResources).has(review.id),
+  );
+  const rowCsv = [];
+  const head = Object.keys(selectedReviews[0]);
+  const headers = head.filter(
+    (head) =>
+      head !== "id" &&
+      head !== "avatar" &&
+      head !== "id" &&
+      head !== "platform_id" &&
+      head !== "shop_id" &&
+      head !== "shopify_product_id" &&
+      head !== "review_id" &&
+      head !== "product_id",
+  );
+  rowCsv.push(headers.join(","));
+
+  selectedReviews.forEach((review) => {
+    const value = headers.map((header) => {
+      return `"${review[header]}"`;
+    });
+    rowCsv.push(value.join(","));
+  });
+  const stringCsv = rowCsv.join("\n");
+  const blob = new Blob([stringCsv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "review.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// CONVERT NATION FLAG
+
+export const nationToFlag = (countryName) => {
+  if (countryName == "the United States") {
+    return `https://flagcdn.com/w40/us.png`
+  } else if (countryName == "European Union") {
+    return `https://flagcdn.com/w40/eu.png`;
+  }
+
+  const code = countries.getAlpha2Code(countryName, "en");
+  if (!code) return "🌐";
+
+  return `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
 };

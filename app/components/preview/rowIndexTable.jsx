@@ -7,7 +7,8 @@ import ImagesReview from "./imageReview";
 export default function RowIndexTable({
   reviews,
   deleteById,
-  selectedResources,disabled
+  selectedResources,
+  disabled,
 }) {
   return (
     <>
@@ -84,7 +85,12 @@ export default function RowIndexTable({
                 </IndexTable.Cell>
               </div>
               <IndexTable.Cell>
-                <Button icon={DeleteIcon} variant="tertiary" onClick={() => deleteById(id)} disabled={disabled}/>
+                <Button
+                  icon={DeleteIcon}
+                  variant="tertiary"
+                  onClick={() => deleteById(id)}
+                  disabled={disabled}
+                />
               </IndexTable.Cell>
             </IndexTable.Row>
           );

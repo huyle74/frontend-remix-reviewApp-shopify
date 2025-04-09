@@ -1,3 +1,8 @@
+html,
+body {
+  z-index: 0;
+}
+
 .Polaris-IndexTable__TableCell {
   position: relative;
 }
@@ -157,6 +162,23 @@
 .import-link-button button:hover:after {
   bottom: 2px;
   left: 2px;
+}
+
+.import-page {
+  z-index: 0;
+}
+
+.popup-overlay {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 @media (min-width: 768px) {

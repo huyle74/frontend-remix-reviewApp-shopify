@@ -20,7 +20,6 @@ export default function ImportButton({ id, onClick, disabled }) {
           url={`/app/import_review_product?productId=${id}`}
           loading={loading}
           disabled={disabled}
-          // variant="primary"
           onClick={() => setLoading(true)}
         >
           Import reviews

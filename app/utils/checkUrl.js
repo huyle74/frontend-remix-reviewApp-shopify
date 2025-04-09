@@ -10,3 +10,15 @@ export function checkUrlAliExpress(url) {
 
   return aliExpressRegex.test(url);
 }
+
+export function detectPlatform(url) {
+  try {
+    const hostname = new URL(url).hostname;
+
+    if (hostname.includes("aliexpress")) return "AliExpress";
+    if (hostname.includes("amazon")) return "Amazon";
+    return "";
+  } catch (e) {
+    return "";
+  }
+}

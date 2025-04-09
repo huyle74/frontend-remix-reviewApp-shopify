@@ -313,7 +313,7 @@ export default function IndexTableWithViewsSearchFilterSorting() {
         <IndexTable.Cell>{customer}</IndexTable.Cell>
         <IndexTable.Cell>
           <Text as="span" alignment="end" numeric>
-            {total}
+            // HIGHLIGHT: {total}
           </Text>
         </IndexTable.Cell>
         <IndexTable.Cell>{paymentStatus}</IndexTable.Cell>
@@ -325,13 +325,13 @@ export default function IndexTableWithViewsSearchFilterSorting() {
   return (
     <Card>
       <IndexFilters
-        sortOptions={sortOptions}
-        sortSelected={sortSelected}
-        queryValue={queryValue}
-        queryPlaceholder="Searching in all"
-        onQueryChange={handleFiltersQueryChange}
-        onQueryClear={() => setQueryValue("")}
-        onSort={setSortSelected}
+        // sortOptions={sortOptions}
+        // sortSelected={sortSelected}
+        // queryValue={queryValue}
+        // queryPlaceholder="Searching in all"
+        // onQueryChange={handleFiltersQueryChange}
+        // onQueryClear={() => setQueryValue("")}
+        // onSort={setSortSelected}
         primaryAction={primaryAction}
         cancelAction={{
           onAction: onHandleCancel,

@@ -4,7 +4,15 @@ export default function exportCSV(reviews, selectedResources) {
   );
   const rowCsv = [];
   const head = Object.keys(selectedReviews[0]);
-  const headers = head.filter((head) => head !== "id" && head !== "avatar");
+  const headers = head.filter(
+    (head) =>
+      head !== "id" &&
+      head !== "avatar" &&
+      head !== "id" &&
+      head !== "platform_id" &&
+      head !== "shop_id" &&
+      head !== "shopify_product_id",
+  );
   rowCsv.push(headers.join(","));
 
   selectedReviews.forEach((review) => {
